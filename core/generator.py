@@ -1,5 +1,6 @@
 """
 Central payload generator for PhantomLFI.
+Linux-focused for web application testing.
 Done by D4rk0ps
 """
 
@@ -25,12 +26,10 @@ class PayloadGenerator:
         base_url: str,
         depth: int = 6,
         attacker_host: str = "ATTACKER_IP",
-        target_os: str = "both",
     ):
         self.base_url = sanitize_url(base_url)
         self.depth = depth
         self.attacker_host = attacker_host
-        self.target_os = target_os
 
     def _prepend_url(self, payloads: dict) -> dict:
         """Prepend the base URL to every payload."""
@@ -44,17 +43,14 @@ class PayloadGenerator:
         all_payloads = {}
 
         # Directory traversal
-        all_payloads.update(
-            generate_traversal_payloads(depth=self.depth, target_os=self.target_os)
-        )
+        all_payloads.update(generate_traversal_payloads(depth=self.depth))
 
         # PHP wrappers
         all_payloads.update(generate_all_wrapper_payloads())
 
         # Log, session, config paths
-        if self.target_os in ("linux", "both"):
-            all_payloads.update(self._generate_log_session_payloads())
-            all_payloads.update(self._generate_config_payloads())
+        all_payloads.update(self._generate_log_session_payloads())
+        all_payloads.update(self._generate_config_payloads())
 
         return self._prepend_url(all_payloads)
 

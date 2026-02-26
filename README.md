@@ -1,6 +1,6 @@
 # PhantomLFI
 
-**LFI / RFI Payload Generation Framework**
+**LFI / RFI Payload Generation & Testing Framework**
 
 Done by **D4rk0ps**
 
@@ -8,42 +8,45 @@ Done by **D4rk0ps**
 
 ## Overview
 
-PhantomLFI is a modular payload generation framework for Local File Inclusion (LFI) and Remote File Inclusion (RFI) testing. It generates payload URLs — no HTTP requests are sent.
+PhantomLFI is a modular framework for Local File Inclusion (LFI) and Remote File Inclusion (RFI) testing on Linux web servers. It can **test** if a target is vulnerable and return the working payload, or **generate** full payload lists.
 
 ## Features
 
-- **Directory Traversal** — Depth 1–10, Linux + Windows targets, encoding variants, slash bypasses
-- **PHP Wrappers** — `php://filter`, `php://input`, `data://`, `expect://`, `zip://`, `phar://`, `file://`
-- **RFI Protocols** — `http://`, `https://`, `ftp://`, `ftps://`, `sftp://`, `gopher://`, `dict://`, `tftp://`, `ldap://`, `ldaps://`, `jar://`, `netdoc://`, `data://`
-- **Encoding Engine** — URL, double URL, mixed, null byte, Unicode, case randomization, slash bypass pipeline
-- **Log & Config Paths** — Apache, Nginx, PHP sessions, SSH keys, web configs
-- **Output** — Colorized terminal, grouped by category, save to file
+- **`--test` mode** — Sends smart detection payloads to the target and tells you the exact working payload
+- **LFI Payloads** — Directory traversal, PHP wrappers, encoding bypasses, log/config paths
+- **RFI Payloads** — HTTP, HTTPS, FTP, FTPS, SFTP, Gopher, Dict, TFTP, LDAP, jar, netdoc, data://
+- **Encoding Engine** — URL, double URL, null byte, Unicode, slash bypasses, case randomization
+- **Linux focused** — Web server targets (Apache, Nginx, PHP sessions, SSH keys, /proc, /etc)
 
 ## Installation
 
 ```bash
-git clone https://github.com/D4rk0ps/PhantomLFI.git
+git clone https://github.com/aabderrafie/PhantomLFI.git
 cd PhantomLFI
-pip install colorama   # optional, for colored output
+pip install requests colorama   # requests needed for --test, colorama optional
 ```
 
 ## Usage
 
+### Test if target is vulnerable (recommended first step)
 ```bash
-# LFI payloads
+python3 main.py --url "http://target.com/page.php?file=" --test
+```
+This sends ~30 curated payloads and reports which ones hit. Gives you the exact working payload.
+
+### Generate LFI payloads
+```bash
 python3 main.py --url "http://target.com/page.php?file=" --lfi
+```
 
-# RFI payloads with attacker host
+### Generate RFI payloads
+```bash
 python3 main.py --url "http://target.com/page.php?file=" --rfi --attacker-host 10.10.14.5
+```
 
-# All payloads, depth 8, save to file
+### Generate all payloads and save to file
+```bash
 python3 main.py --url "http://target.com/page.php?file=" --all --depth 8 -o output/results.txt
-
-# Linux-only, no color
-python3 main.py --url "http://target.com/page.php?file=" --lfi --os linux --no-color
-
-# Windows-only, depth 4
-python3 main.py --url "http://target.com/page.php?file=" --lfi --os windows --depth 4
 ```
 
 ## Options
@@ -51,12 +54,13 @@ python3 main.py --url "http://target.com/page.php?file=" --lfi --os windows --de
 | Flag | Description |
 |---|---|
 | `--url` | Base URL with injectable parameter (required) |
+| `--test` | Test if target is vulnerable (sends requests) |
 | `--lfi` | Generate LFI payloads |
 | `--rfi` | Generate RFI payloads |
 | `--all` | Generate LFI + RFI payloads |
 | `--depth [1-10]` | Traversal depth (default: 6) |
 | `--attacker-host` | Attacker IP for RFI (default: ATTACKER_IP) |
-| `--os` | Target OS: `linux`, `windows`, `both` (default: both) |
+| `--timeout` | Request timeout for --test mode (default: 10s) |
 | `-o / --output` | Save results to file |
 | `--no-color` | Disable colored output |
 
@@ -67,6 +71,7 @@ PhantomLFI/
 ├── main.py                 # CLI entry point
 ├── core/
 │   ├── generator.py        # Central payload orchestrator
+│   ├── tester.py           # Vulnerability detection (--test)
 │   ├── encoders.py         # Encoding pipeline
 │   ├── wrappers.py         # PHP wrapper payloads
 │   ├── traversal.py        # Directory traversal payloads

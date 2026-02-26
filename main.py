@@ -35,6 +35,7 @@ def parse_arguments():
     )
 
     mode_group = parser.add_mutually_exclusive_group(required=True)
+    mode_group.add_argument("--test", action="store_true", help="Test if target is vulnerable (sends requests)")
     mode_group.add_argument("--lfi", action="store_true", help="Generate LFI payloads")
     mode_group.add_argument("--rfi", action="store_true", help="Generate RFI payloads")
     mode_group.add_argument("--all", action="store_true", help="Generate LFI + RFI payloads")
@@ -50,8 +51,8 @@ def parse_arguments():
     parser.add_argument("-o", "--output", help="Save output to file")
     parser.add_argument("--no-color", action="store_true", help="Disable colored output")
     parser.add_argument(
-        "--os", dest="target_os", choices=["linux", "windows", "both"],
-        default="both", help="Target OS (default: both)",
+        "--timeout", type=int, default=10,
+        help="Request timeout in seconds for --test mode (default: 10)",
     )
 
     return parser.parse_args()
@@ -64,11 +65,21 @@ def main():
 
     banner(use_color)
 
+    # --- Test Mode ---
+    if args.test:
+        from core.tester import run_test
+        run_test(
+            base_url=args.url,
+            use_color=use_color,
+            timeout=args.timeout,
+        )
+        return
+
+    # --- Generation Mode ---
     generator = PayloadGenerator(
         base_url=args.url,
         depth=args.depth,
         attacker_host=args.attacker_host,
-        target_os=args.target_os,
     )
 
     all_payloads = []
@@ -79,7 +90,6 @@ def main():
         f"  Target URL    : {args.url}",
         f"  Mode          : {'LFI' if args.lfi else 'RFI' if args.rfi else 'ALL'}",
         f"  Depth         : {args.depth}",
-        f"  Target OS     : {args.target_os.upper()}",
         f"  Attacker Host : {args.attacker_host}",
         f"  Timestamp     : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
         "",

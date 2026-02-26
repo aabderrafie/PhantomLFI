@@ -1,10 +1,11 @@
 """
 Default target paths and protocol definitions for PhantomLFI.
+Linux-focused for web application testing.
 Done by D4rk0ps
 """
 
 # =====================================================================
-# Linux Target Files
+# Linux Sensitive Files
 # =====================================================================
 
 LINUX_SENSITIVE_FILES = [
@@ -33,6 +34,10 @@ LINUX_SENSITIVE_FILES = [
     "/proc/sched_debug",
 ]
 
+# =====================================================================
+# Log Files
+# =====================================================================
+
 LINUX_LOG_FILES = [
     "/var/log/apache2/access.log",
     "/var/log/apache2/error.log",
@@ -52,6 +57,10 @@ LINUX_LOG_FILES = [
     "/var/log/btmp",
     "/var/log/wtmp",
 ]
+
+# =====================================================================
+# Web Server Configs
+# =====================================================================
 
 LINUX_APACHE_PATHS = [
     "/etc/apache2/apache2.conf",
@@ -74,6 +83,10 @@ LINUX_NGINX_PATHS = [
     "/usr/local/etc/nginx/nginx.conf",
 ]
 
+# =====================================================================
+# PHP Sessions
+# =====================================================================
+
 LINUX_PHP_SESSION_PATHS = [
     "/var/lib/php/sessions/sess_SESSIONID",
     "/var/lib/php5/sessions/sess_SESSIONID",
@@ -81,6 +94,10 @@ LINUX_PHP_SESSION_PATHS = [
     "/tmp/sess_SESSIONID",
     "/tmp/php_sessions/sess_SESSIONID",
 ]
+
+# =====================================================================
+# SSH Keys
+# =====================================================================
 
 LINUX_SSH_KEYS = [
     "/root/.ssh/id_rsa",
@@ -90,6 +107,10 @@ LINUX_SSH_KEYS = [
     "/home/USER/.ssh/authorized_keys",
 ]
 
+# =====================================================================
+# Web App Configs
+# =====================================================================
+
 LINUX_WEB_CONFIG = [
     "/var/www/html/.htaccess",
     "/var/www/html/wp-config.php",
@@ -98,33 +119,6 @@ LINUX_WEB_CONFIG = [
     "/var/www/html/configuration.php",
     "/var/www/html/LocalSettings.php",
     "/var/www/html/includes/configure.php",
-]
-
-# =====================================================================
-# Windows Target Files
-# =====================================================================
-
-WINDOWS_SENSITIVE_FILES = [
-    r"C:\Windows\win.ini",
-    r"C:\Windows\system.ini",
-    r"C:\Windows\System32\drivers\etc\hosts",
-    r"C:\Windows\System32\config\SAM",
-    r"C:\Windows\System32\config\SYSTEM",
-    r"C:\Windows\System32\config\SECURITY",
-    r"C:\Windows\debug\NetSetup.LOG",
-    r"C:\Windows\repair\SAM",
-    r"C:\Windows\repair\SYSTEM",
-    r"C:\boot.ini",
-    r"C:\inetpub\wwwroot\web.config",
-    r"C:\inetpub\logs\LogFiles",
-    r"C:\xampp\apache\conf\httpd.conf",
-    r"C:\xampp\php\php.ini",
-    r"C:\xampp\mysql\bin\my.ini",
-    r"C:\xampp\passwords.txt",
-    r"C:\xampp\htdocs\.env",
-    r"C:\Users\Administrator\Desktop\desktop.ini",
-    r"C:\Users\Administrator\NTUser.dat",
-    r"C:\Program Files\MySQL\my.ini",
 ]
 
 # =====================================================================

